@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义滚动条</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+            list-style: none;
+        }
+        .clearfix:after {
+            content: '';
+            display: block;
+            zoom: 1;
+            clear: both;
+            visibility: hidden;
+        }
+        .container {
+            width: 800px;
+            font-size: 14px;
+            font-family: '微软雅黑';
+            margin: 20px 0;
+            padding-right: 40px;
+            position: relative;
+        }
+        nav {
+            border-bottom: 1px solid #ddd;
+            height: 50px;
+            padding: 0 50px;
+        }
+        nav ul {
+            height: 100%;
+        }
+        nav ul li {
+            float: left;
+            width: 150px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+        }
+        li.tab-active {
+            border-bottom: 1px solid darkgreen;
+            color: darkgreen;
+        }
+
+        .content {
+            height: 600px;
+            overflow: hidden;
+            padding-left: 20px;
+            padding-top: 20px;
+        }
+        .content h2 {
+            text-align: center;
+        }
+        .content p {
+            text-indent: 2em;
+            text-align: justify;
+            line-height: 2;
+        }
+        .scroll-bar {
+            width: 10px;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right:0;
+            border-right: 1px solid #ddd;
+        }
+        .scroll-block {
+            width: 9px;
+            height: 50px;
+            background: #777;
+            position: absolute;
+            top: 0;
+            left: 1px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <ul class="clearfix">
+                <li class="tab-item tab-active">第一篇</li>
+                <li class="tab-item">第二篇</li>
+                <li class="tab-item">第三篇</li>
+                <li class="tab-item">第四篇</li>
+            </ul>
+        </nav>
+        <article class="content">
+            <section class="anchor">
+                <h2 class="title">第一篇</h2>
+                <p>一滴，二滴，三滴，春雨悄悄来临，丝丝如针，丝丝如线，随风潜入夜，润物细无声。炊烟袅袅，伴着清风，伴着细雨，那是山里哪户人家在煮香喷喷的番薯粥？令人口水直流。大人们一声吆喝，小孩们蜂拥而上，拿着碗筷，敲打出清脆的音乐，即使满面灰尘，即使鼻涕直流，即使手指上藏着黑黑的污垢，即使头发乱蓬蓬，可是这又有什么关系呢，这是多么和乐淳朴的一家。春雨在悄悄地下，带着丝丝的冰凉，丝丝的温暖。轻雾笼罩着大地，朦胧着人们的双眼，这样的春季土地潮湿，年青的小伙子骑在牛上，吹着木笛，老黄牛忠实而勤恳地拉着铁犁，笛声，声声入耳，破土声，只有老黄牛才能听得见。善良而勤劳的人们啊，这微微的雨声你们可曾听见，它仿佛昭示着什么？昭示着今年五谷丰登，风调雨顺，好收成啊！昭示着你们的对希望的信心，昭示着你们对未来的美好生活的向往，昭示着你们的下一代将走出大山考个大学，风光回来建设家乡！这样的春雨，母亲你一定非常的熟悉，它对于您是那样的湿润，那样的吉祥，那样的甘甜酣畅，您带着这样的回忆，走出大山读大学，可是您几十年身在城市心却牵挂着这片孕育您二十年的土地，牵挂着养育您二十年的老母亲，春雨，总勾起您这样甜美的回忆！</p>
+            </section>
+            <section class="anchor">
+                <h2 class="title">第二篇</h2>
+                <p>一滴，二滴，三滴，春雨悄悄来临，丝丝如针，丝丝如线，随风潜入夜，润物细无声。炊烟袅袅，伴着清风，伴着细雨，那是山里哪户人家在煮香喷喷的番薯粥？令人口水直流。大人们一声吆喝，小孩们蜂拥而上，拿着碗筷，敲打出清脆的音乐，即使满面灰尘，即使鼻涕直流，即使手指上藏着黑黑的污垢，即使头发乱蓬蓬，可是这又有什么关系呢，这是多么和乐淳朴的一家。春雨在悄悄地下，带着丝丝的冰凉，丝丝的温暖。轻雾笼罩着大地，朦胧着人们的双眼，这样的春季土地潮湿，年青的小伙子骑在牛上，吹着木笛，老黄牛忠实而勤恳地拉着铁犁，笛声，声声入耳，破土声，只有老黄牛才能听得见。善良而勤劳的人们啊，这微微的雨声你们可曾听见，它仿佛昭示着什么？昭示着今年五谷丰登，风调雨顺，好收成啊！昭示着你们的对希望的信心，昭示着你们对未来的美好生活的向往，昭示着你们的下一代将走出大山考个大学，风光回来建设家乡！这样的春雨，母亲你一定非常的熟悉，它对于您是那样的湿润，那样的吉祥，那样的甘甜酣畅，您带着这样的回忆，走出大山读大学，可是您几十年身在城市心却牵挂着这片孕育您二十年的土地，牵挂着养育您二十年的老母亲，春雨，总勾起您这样甜美的回忆！</p>
+            </section>
+            <section class="anchor">
+                <h2 class="title">第三篇</h2>
+                <p>一滴，二滴，三滴，春雨悄悄来临，丝丝如针，丝丝如线，随风潜入夜，润物细无声。炊烟袅袅，伴着清风，伴着细雨，那是山里哪户人家在煮香喷喷的番薯粥？令人口水直流。大人们一声吆喝，小孩们蜂拥而上，拿着碗筷，敲打出清脆的音乐，即使满面灰尘，即使鼻涕直流，即使手指上藏着黑黑的污垢，即使头发乱蓬蓬，可是这又有什么关系呢，这是多么和乐淳朴的一家。春雨在悄悄地下，带着丝丝的冰凉，丝丝的温暖。轻雾笼罩着大地，朦胧着人们的双眼，这样的春季土地潮湿，年青的小伙子骑在牛上，吹着木笛，老黄牛忠实而勤恳地拉着铁犁，笛声，声声入耳，破土声，只有老黄牛才能听得见。善良而勤劳的人们啊，这微微的雨声你们可曾听见，它仿佛昭示着什么？昭示着今年五谷丰登，风调雨顺，好收成啊！昭示着你们的对希望的信心，昭示着你们对未来的美好生活的向往，昭示着你们的下一代将走出大山考个大学，风光回来建设家乡！这样的春雨，母亲你一定非常的熟悉，它对于您是那样的湿润，那样的吉祥，那样的甘甜酣畅，您带着这样的回忆，走出大山读大学，可是您几十年身在城市心却牵挂着这片孕育您二十年的土地，牵挂着养育您二十年的老母亲，春雨，总勾起您这样甜美的回忆！</p>
+            </section>
+            <section class="anchor">
+                <h2 class="title">第四篇</h2>
+                <p>一滴，二滴，三滴，春雨悄悄来临，丝丝如针，丝丝如线，随风潜入夜，润物细无声。炊烟袅袅，伴着清风，伴着细雨，那是山里哪户人家在煮香喷喷的番薯粥？令人口水直流。大人们一声吆喝，小孩们蜂拥而上，拿着碗筷，敲打出清脆的音乐，即使满面灰尘，即使鼻涕直流，即使手指上藏着黑黑的污垢，即使头发乱蓬蓬，可是这又有什么关系呢，这是多么和乐淳朴的一家。春雨在悄悄地下，带着丝丝的冰凉，丝丝的温暖。轻雾笼罩着大地，朦胧着人们的双眼，这样的春季土地潮湿，年青的小伙子骑在牛上，吹着木笛，老黄牛忠实而勤恳地拉着铁犁，笛声，声声入耳，破土声，只有老黄牛才能听得见。善良而勤劳的人们啊，这微微的雨声你们可曾听见，它仿佛昭示着什么？昭示着今年五谷丰登，风调雨顺，好收成啊！昭示着你们的对希望的信心，昭示着你们对未来的美好生活的向往，昭示着你们的下一代将走出大山考个大学，风光回来建设家乡！这样的春雨，母亲你一定非常的熟悉，它对于您是那样的湿润，那样的吉祥，那样的甘甜酣畅，您带着这样的回忆，走出大山读大学，可是您几十年身在城市心却牵挂着这片孕育您二十年的土地，牵挂着养育您二十年的老母亲，春雨，总勾起您这样甜美的回忆！</p>
+            </section>
+        </article>
+        <div class="scroll-bar">
+            <div class="scroll-block"></div>
+        </div>
+    </div>
+    <script src="jquery.2.2.0.js"></script>
+    <script src="scrollbar.js"></script>
+    <script>
+        $(document).ready(function() {
+            new scrollBar.CustomScrollBar({
+                contSelector: '.content',
+                barSelector: '.scroll-bar',
+                sliderSelector: '.scroll-block'
+            });
+        })
+    </script>
+</body>
+</html>

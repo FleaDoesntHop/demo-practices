@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>形形色色的linear-gradient</title>
+    <style>
+        .box {
+            width: 200px;
+            height: 200px;
+            display: inline-block;
+            vertical-align: bottom;
+            margin-left: 50px;
+            margin-bottom: 50px
+        }
+
+        .box1 {
+            background: linear-gradient(#fb3 20%, #58a 80%);
+        }
+        .box2 {
+            background: linear-gradient(#fb3 50%, #58a 50%);
+        }
+        .box3 {
+            background: linear-gradient(#fb3 30%, #58a 0);
+            background-size: 100% 50px
+        }
+        .box4 {
+            background: linear-gradient(to right, #fb3 30%, #58a 0);
+            background-size: 50px 100%
+        }
+        .box5 {
+            background: linear-gradient(45deg, #fb3 25%, #58a 0, #58a 50%, #fb3 0, #fb3 75%, #58a 0);
+            background-size: 42px 42px
+        }
+        .box6 {
+            background: repeating-linear-gradient(60deg, #fb3, #fb3 15px, #58a 0, #58a 30px);
+        }
+        .box7 {
+            background: #58a;
+            background-image: repeating-linear-gradient(30deg, hsla(0, 0%, 100%, .1), hsla(0, 0%, 100%, .1) 15px, transparent 0, transparent 30px);
+        }
+    </style>
+</head>
+<body>
+    <!--原理：默认背景图像是repeat的-->
+    <div class="box box1">20%, 80%</div>
+    <div class="box box2">50%, 50%</div>
+    <div class="box box3">水平条纹</div>
+    <div class="box box4">垂直条纹</div>
+    <div class="box box5">45度斜条纹</div>
+    <div class="box box6">60度斜条纹——repeating-linear-gradient</div>
+    <div class="box box7">同色系条纹</div>
+</body>
+</html>
