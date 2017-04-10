@@ -65,7 +65,7 @@
             htmlView = document.getElementById('file_contents_html'),
             htmlEditor = document.getElementById('file_contents_html_editor');
 
-        //  开启designMode模式，使iframe进入可编辑状态
+        //  开启designMode模式，使iframe进入可编辑状态; designMode类似于contentEditable，但是赋值对象是document本身
         visualEditorDoc.designMode = 'on';
         //  当用户敲击键盘进行改动后，将文本标记为dirty状态
         visualEditorDoc.addEventListener('keyup', markDirty, false);
@@ -113,6 +113,60 @@
 
         editVisualButton.addEventListener('click', toggleActiveView, false);
         editHtmlButton.addEventListener('click', toggleActiveView, false);
+
+        var visualEditorToolbar = document.getElementById('file_contents_visual_toolbar');
+
+        /**
+         * 事件处理器RichTextAction应用于可视化编辑器工具栏上所有的按钮。当用户点击工具栏按钮时，该事件处理器会判断用户点击的到底是什么按钮。
+         * 点击按钮时通过标签上的data-command属性向execCommand方法传递command指令
+         * execCommand接收1~3个参数：
+         * 1. 第一个参数command是字符串，command含有编辑或格式化行为的名称；
+         * 2. 第二个参数showUI是布尔值，确定用户是否能看到与command相关的默认UI（有些command没有UI）；
+         * 3. 第三个参数value是字符串。execCommand将调入以value为参数的command参数
+         * execCommand所需传入的参数个数跟第一个参数的命令相关。
+         * @param e
+         */
+         var richTextAction = function(e) {
+             var command,
+                 node = (e.target.nodeName === 'BUTTON') ? e.target : e.target.parentNode;
+
+             if(node.dataset) {
+                 command = node.dataset.command;
+             } else {
+                 command = node.getAttribute('data-command');
+             }
+
+             var doPopupCommand = function(command, promptText, promptDefault) {
+                 //  由于该应用需要一种自定义UI，所以将showUI设置为false。第三个参数value被传入一个（window对象的）prompt方法。它共有两个字符串参数，第一个参数提示用户输入值，另一个参数含有默认的输入值。
+                 visualEditorDoc.execCommand(command, false, prompt(promptText, promptDefault));
+             }
+
+             if(command === 'createLink') {
+                 doPopupCommand(command, 'Enter link URL:', 'http://www.example.com');
+             } else if(command === 'insertImage') {
+                 doPopupCommand(command, 'Enter image URL:', 'http://www.example.com/image.png');
+             } else if(command === 'insertMap') {
+                 //  使用navigator.geolocation.getCurrentPosition()方法获取当前位置的经纬度，然后作为center的参数传给google map api，返回的图片用execCommand的insertImage方法插入到文本中
+                 if(navigator.geolocation) {
+                     node.innerHTML = 'Loading';
+
+                     navigator.geolocation.getCurrentPosition(function(pos) {
+                         var coords = pos.coords.latitude + ',' + pos.coords.longitude;
+                         var img = 'https://maps.googleapis.com/maps/api/staticmap?center=' + coords + '&zoom=11&size=200x200&sensor=false';
+
+                         visualEditorDoc.execCommand('insertImage', false, img);
+                         node.innerHTML = 'Location Map';
+                     })
+                 } else {
+                     alert('Geolocation not available', 'No geolocation data');
+                 }
+             } else {
+                 visualEditorDoc.execCommand(command);
+             }
+         }
+
+         visualEditorToolbar.addEventListener('click', richTextAction, false);
+
     };
 
     var init = function() {
