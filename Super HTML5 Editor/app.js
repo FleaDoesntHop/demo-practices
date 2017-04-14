@@ -167,6 +167,197 @@
 
          visualEditorToolbar.addEventListener('click', richTextAction, false);
 
+        /**
+         * 以下为HTML5 File System API的调用。File System API目前只有chrome13.0以上支持。其它浏览器都不支持。
+         * @type {*}
+         */
+
+        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || window.mozRequestFileSystem || window.msRequestFileSystem || false;
+
+        window.storageInfo = navigator.persistentStorage || navigator.webkitPersistentStorage || navigator.mozPersistentStorage || navigator.msPersistentStorage || false;
+
+        var stType = window.PERSISTENT || 1,
+            stSize = (5 * 1024 * 1024),
+            fileSystem,
+            fileListEl = document.getElementById('files'),
+            currentFile;
+
+        /**
+         * 适用于所有file system api方法调用的标准错误函数
+         * @param e
+         */
+        var fsError = function(e) {
+            if(e.code === 9) {
+                alert('File name already exists.', 'File System Error');
+            } else {
+                alert('An unexpected error occured. Error code: ' + e.code);
+            }
+        };
+
+        var qmError = function(e) {
+            if(e.code === 22) {
+                alert('Quota exceeded.', 'Quota Management Error');
+            } else {
+                alert('An unexpected error occured. Error code: ' + e.code);
+            }
+        };
+
+
+        /**
+         * 查看浏览器是否支持file system api与quota management api.
+         */
+        if(requestFileSystem && storageInfo) {
+            var checkQuota = function(currentUsage, quota) {
+                var checkQuota = function(currentUsage, quota) {
+                    if(quota === 0) {
+                        //  因为该应用存在一个持久性文件系统，配额请求将触发一个消息，该消息征求用户的允许，以便访问浏览器文件系统
+                        storageInfo.requestQuota(stType, stSize, getFs, qmError);
+                    } else {
+                        getFS(quota);
+                    }
+                };
+            };
+
+             // 如果queryUsageAndQuota成功执行，则它会把usage和quotainfo一并赋予回调函数checkQuota，否则就会调用qmError。checkQuota函数用于确定是否有足够的配额来储存文件，如果配额不够，则需要请求一个更大的配额。
+            storageInfo.queryUsageAndQuota(stType, checkQuota, qmError);
+
+            var getFS = function(quota) {
+                //  利用requestFileSystem获取文件系统对象
+                requestFileSystem(stType, quota, displayFileSystem, fsError);
+            };
+
+            var displayFileSystem = function(fs) {
+                fileSystem = fs;
+                updateBrowserFileList();
+                // 如果编辑器视图为当前视图，则将该文件加载进编辑器
+                if(view === 'editor') {
+                    loadFile(fileName);
+                }
+            }
+
+        } else {
+            alert('File System API not supported', 'Unsupported');
+        }
+
+        var displayBrowserFileList = function(files) {
+            fileListEl.innerHTML = '';
+            //  利用文件系统中的文件数目来更新文件计数器
+            document.getElementById('file_count').innerHTML = files.length;
+            if(file.length > 0) {
+                files.forEach(function(file, i) {
+                    //  注意li设定draggable = true
+                    var li = '<li id="li_' + i + '"draggable="true">' + file.name + '<div><button id="view_' + i + '">View</button>'+ '<button class="green" id="edit_'+ i + '">Edit</button>' + '<button class="red" id="del_' + i + '">Delete</button>' +'</div></li>';
+
+                    //  insertAdjacentHTML函数（类似的还有insertAdjacentText，insertAdjacentElement这两种方法）——接收的参数有两个，position, text —— position可选四个值，'beforebegin', 'afterbegin', 'beforeend', 'afterend'
+
+                    fileListEl.insertAdjacentHTML('beforeend', li);
+                    var listItem = document.getElementById('li_' + i),
+                        viewBtn = document.getElementById('view_' + i),
+                        editBtn = document.getElementById('edit_' + i),
+                        deleteBtn = document.getElementById('del_' + i);
+                    var doDrag = function(e) {
+                        dragFile(file, e);
+                    };
+                    var doView = function() {
+                        viewFile(file);
+                    };
+                    var doEdit = function() {
+                        editFile(file);
+                    };
+                    var doDelete = function() {
+                        deleteFile(file);
+                    }
+
+                    viewBtn.addEventListener('click', doView, false);
+                    editBtn.addEventListener('click', doEdit, false);
+                    deleteBtn.addEventListener('click', doDelete, false);
+                    listItem.addEventListener('dragstart', doDrag, false);
+
+                });
+            } else {
+                //  如果没有文件，则显示空列表信息
+                fileListEl.innerHTML = '<li class="empty">No files to display</li>';
+            }
+        }
+
+        var updateBrowserFilesList = function() {
+            //  创建一个DirectoryReader对象，稍后将用它来获取整个列表的文件
+            var dirReader = fileSystem.root.createReader(),
+                files = [];
+
+            //  使用循环函数，每次读取目录列表中的一组文件，知道所有文件都被读取完为止
+            var readFileList = function() {
+                dirReader.readEntries(function(fileSet) {
+                    if(!fileSet.length) {
+                        //  当到达目录的末尾时，调用displayBrowserFileList函数，将按字母排序的文件数组作为参数传入
+                        displayBrowserFileList(files.sort());
+                    } else {
+                        for(var i = 0, len = fileSet.length; i< len; i++) {
+                            //  如果还未到达目录末尾，将刚读取的文件推送入文件数组，然后再次循环调用readFileList函数
+                            files.push(fileSet[i]);
+                        }
+                        readFileList();
+                    }
+                }, fsError);
+            }
+            readFileList();
+        }
+
+        /**
+         * file system api的getFile方法可获取文件系统的文件条目。
+         * readAsText方法将读取文件内容。
+         * 最后，loadFile函数会将文件内容显示在可视化编辑器与HTML编辑器中。
+         *
+         * getFile方法需要4个参数：（1）文件的相对或绝对路径；（2）选项对象（{create: boolean, exclusive: boolean},都默认设置为false）;（3）成功的回调函数；（4）错误回调函数
+         */
+
+        var loadFile = function(name) {
+            fileSystem.root.getFile(name, {}, function(fileEntry) {
+                currentFile = fileEntry;
+                //  FileReader对象（也就是文件读取器）用来读取文件内容。当文件读取器读取完毕时，会触发onloadend事件处理器，更新可视化编辑器与HTML编辑器。
+                fileEntry.file(function(file) {
+                    var reader = new FileReader();
+                    //  File System API的file方法用来获取fileEntry的文件，并将文件传入回调函数
+                    reader.onloadend = function(e) {
+                        updateVisualEditor(this.result);
+                        updateHTMLEditor(this.result);
+                    }
+                    //  创建好心的FileReader并且定义了它的onloadend事件后，调用readAsText，读取文件并将文件加载到文件读取器的result属性中。
+                    reader.readAsText(file);
+                }, fsError);
+            }, fsError);
+        };
+
+    //    查看、编辑、删除文件
+        /**
+         * 利用toURL方法，可轻松实现查看文件内容的功能，只需将文件的URL位置传给一个浏览器窗口，使文件显示出来即可。
+         * @param file
+         */
+        var viewFile = function(file) {
+            window.open(file.toURL(), 'SuperEditorPreview', 'width=800,height=600');
+        };
+
+        /**
+         * 通过改变URL散列值，激活文件编辑器视图
+         * @param file
+         */
+        var editFile = function(file) {
+            loadFile(file.name);
+            location.href = '#editor/' + file.name;
+        };
+
+        var deleteFile = function(file) {
+            var deleteSuccess = function() {
+                alert('File ' + file.name + ' deleted successfully', 'File deleted');
+                updateBrowserFilesList();
+            };
+
+            if(confirm('File will be deleted. Are you sure?', 'Confirm delete')) {
+                //  remove函数完成后，将执行deleteSuccess回调函数，它将调用updateBrowserFileList来确保列表得到更新。
+                file.remove(deleteSuccess, fsError);
+            }
+        };
+
     };
 
     var init = function() {
